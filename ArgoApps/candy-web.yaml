@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: candy-web
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'http://10.10.70.84:30060/ahmed_zeid/Argo_Repo.git'
+    path: candy-web/overlays
+    targetRevision: main
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: candy
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      enabled: true
+    syncOptions:
+      - CreateNamespace=true
+

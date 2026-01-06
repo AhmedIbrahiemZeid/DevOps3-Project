@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy
+  namespace: myapp
+spec:
+  selector:
+    matchLabels:
+      app: canary-caddy
+  template:
+    metadata:
+      labels:
+        app: canary-caddy   # pod labels for Service matching
+    spec:
+      volumes:
+      - name: html
+        configMap:
+          name: html-canary
+

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caddy
+spec:
+  selector:
+    matchLabels:
+      app: prod-caddy   # must match pod labels
+  template:
+    metadata:
+      labels:
+        app: prod-caddy
+    spec:
+      volumes:
+      - name: html
+        configMap:
+          name: html-prod
+

@@ -1,0 +1,18 @@
+resources:
+- ../../base
+- configmap.yaml
+- ingress.yaml
+nameSuffix: -prod
+
+
+patches:
+- target:
+    kind: Deployment
+    name: caddy
+    namespace: myapp
+  path: deployment-patch.yaml
+
+- target:
+    kind: Service
+    name: myapp
+  path: service-patch.yaml

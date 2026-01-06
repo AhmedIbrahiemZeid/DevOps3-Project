@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webserver
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'http://10.10.70.84:30060/ahmed_zeid/Argo_Repo.git'
+    targetRevision: main
+    path: webserver
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: tls-nginx
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

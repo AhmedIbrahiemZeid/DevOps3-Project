@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: caddy-canary-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+        - release: prod
+          revision: prod
+        - release: canary
+          revision: canary
+  template:
+    metadata:
+      name: '{{release}}-caddy'
+    spec:
+      project: default
+      source:
+        repoURL: 'http://10.10.70.84:30060/ahmed_zeid/Argo_Repo.git'
+        targetRevision: '{{revision}}'
+        path: 'canary/overlays/{{release}}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: myapp
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+

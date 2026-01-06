@@ -1,0 +1,20 @@
+resources:
+- ../../base
+- configmap.yaml
+- ingress-canary.yaml
+
+nameSuffix: -canary
+
+patches:
+- target:
+    kind: Deployment
+    name: caddy
+    namespace: myapp
+  path: deployment-patch.yaml
+
+- target:
+    kind: Service
+    name: myapp
+    namespace: myapp
+  path: service-patch.yaml
+

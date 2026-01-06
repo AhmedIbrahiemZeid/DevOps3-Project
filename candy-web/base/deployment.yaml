@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: candy-web
+  labels:
+    app: candy-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: candy-web
+  template:
+    metadata:
+      labels:
+        app: candy-web
+    spec:
+      containers:
+      - name: candy-web
+        image: caddy:2-alpine   
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: web-content
+            mountPath: /usr/share/caddy/index.html
+            subPath: index.html
+      volumes:
+        - name: web-content
+          configMap:
+            name: candy-web-config
+

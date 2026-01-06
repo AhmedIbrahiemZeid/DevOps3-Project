@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: candy-web-ingress
+  namespace: candy
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: candy-web.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: candy-web
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - candy-web.local
+      secretName: candy-web-tls
+---
