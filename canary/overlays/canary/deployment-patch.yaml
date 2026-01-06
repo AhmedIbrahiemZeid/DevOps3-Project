@@ -10,7 +10,7 @@ spec:
   template:
     metadata:
       labels:
-        app: canary-caddy   # pod labels for Service matching
+        app: canary-caddy   
     spec:
       volumes:
       - name: html
