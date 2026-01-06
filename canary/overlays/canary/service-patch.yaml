@@ -5,7 +5,7 @@ metadata:
   namespace: myapp
 spec:
   selector:
-    app: canary-caddy   # selects the canary pods
+    app: canary-caddy  
   ports:
   - port: 80
     targetPort: 80
