@@ -2,13 +2,13 @@
 
 ## 🚀 Project Overview
 
-This DevOps project demonstrates a comprehensive GitOps workflow using ArgoCD to manage multiple Kubernetes applications with different deployment strategies and tools. The project showcases automated synchronization, secure certificate management, and canary deployment patterns.
+This DevOps project demonstrates a comprehensive GitOps workflow using ArgoCD to manage multiple Kubernetes applications with different deployment strategies and tools. The project showcases automated synchronization, secure certificate management, and canary deployment patterns using ArgoCD ApplicationSets.
 
 ## 📁 Project Structure
 ```
 Argo_Repo/
 ├── ArgoApps/                    # Bootstrap directory - ArgoCD Applications
-│   ├── canary.yaml              # Canary deployment app definition
+│   ├── canary.yaml              # Canary deployment ApplicationSet definition
 │   ├── candy-web.yaml           # Caddy webserver app definition
 │   └── webserver.yaml           # Nginx webserver app definition
 │
@@ -74,12 +74,14 @@ Argo_Repo/
 - **Sealed Secrets** for encrypted TLS certificates
 - Customizable content through overlays
 
-### 4. **Canary Deployment (canary/)**
-- Advanced deployment strategy using Kustomize
+### 4. **Canary Deployment with ApplicationSet (canary/)**
+- Advanced deployment strategy using **ArgoCD ApplicationSet**
+- Automated multi-environment deployment (prod + canary)
 - **Tag-based switching** (not branch-based)
-- Separate canary and production overlays
+- Separate canary and production overlays managed by ApplicationSet
 - Traffic splitting capabilities
 - Canary-specific ingress rules
+- Single ApplicationSet generates multiple Applications automatically
 
 ## 🔐 Security with Sealed Secrets
 
@@ -94,6 +96,7 @@ This project uses **Sealed Secrets** to encrypt sensitive data (TLS certificates
 
 - **Kubernetes**: Container orchestration
 - **ArgoCD**: GitOps continuous delivery
+- **ArgoCD ApplicationSet**: Multi-environment application management
 - **Kustomize**: Configuration management
 - **Sealed Secrets**: Secret encryption
 - **Nginx**: Traditional web server
@@ -104,63 +107,69 @@ This project uses **Sealed Secrets** to encrypt sensitive data (TLS certificates
 
 ### Traditional Deployment (Nginx)
 ```
-Git Repository → ArgoCD → Kubernetes → Nginx Pod
+Git Repository → ArgoCD Application → Kubernetes → Nginx Pod
 ```
 
 ### Kustomized Deployment (Caddy)
 ```
-Git Repository → ArgoCD → Kustomize → Kubernetes → Caddy Pod
+Git Repository → ArgoCD Application → Kustomize → Kubernetes → Caddy Pod
 ```
 
-### Canary Deployment
+### Canary Deployment with ApplicationSet
 ```
-Git Repository → ArgoCD → Kustomize (Overlay) → 
-    ├── Production Pod (stable)
-    └── Canary Pod (new version)
+Git Repository → ArgoCD ApplicationSet → 
+    ├── Production Application → Kustomize (prod overlay) → Production Pod
+    └── Canary Application → Kustomize (canary overlay) → Canary Pod
 ```
 
-## 🚦 Canary Deployment Flow
+## 🚦 Canary Deployment Flow with ApplicationSet
 
-1. **Base Configuration**: Common resources shared between environments
-2. **Production Overlay**: Stable production version
-3. **Canary Overlay**: New version for testing
-4. **Tag-Based Switching**: Deploy specific versions using image tags
-5. **Traffic Splitting**: Gradual rollout with weighted traffic distribution
+1. **ApplicationSet Definition**: Single YAML defines deployment pattern for multiple environments
+2. **Generator**: ApplicationSet automatically creates separate Applications for prod and canary
+3. **Base Configuration**: Common resources shared between environments
+4. **Production Overlay**: Stable production version deployed automatically
+5. **Canary Overlay**: New version for testing deployed simultaneously
+6. **Tag-Based Switching**: Deploy specific versions using image tags in overlays
+7. **Traffic Splitting**: Gradual rollout with weighted traffic distribution via Ingress annotations
 
 ## 🔄 How It Works
 
-1. **Bootstrap**: Deploy the ArgoCD Applications in `ArgoApps/`
-2. **Auto-Sync**: ArgoCD automatically syncs all defined applications
-3. **Nginx App**: Deploys traditional Nginx webserver with sealed TLS
-4. **Caddy App**: Deploys Caddy using Kustomize with overlays
-5. **Canary App**: Deploys both production and canary versions
-6. **Tag Management**: Switch between versions by updating image tags in overlays
+1. **Bootstrap**: Deploy the ArgoCD Applications and ApplicationSet in `ArgoApps/`
+2. **ApplicationSet Magic**: The canary ApplicationSet automatically generates both prod and canary Applications
+3. **Auto-Sync**: ArgoCD automatically syncs all defined applications
+4. **Nginx App**: Deploys traditional Nginx webserver with sealed TLS
+5. **Caddy App**: Deploys Caddy using Kustomize with overlays
+6. **Canary Apps**: ApplicationSet deploys both production and canary versions simultaneously
+7. **Tag Management**: Switch between versions by updating image tags in overlays
 
 ## 🎓 Learning Outcomes
 
 - GitOps principles with ArgoCD
+- **ArgoCD ApplicationSet for multi-environment deployments**
 - Kustomize base and overlay patterns
 - Secure secret management with Sealed Secrets
 - Canary deployment strategies
 - Tag-based versioning
 - Multi-application orchestration
 - Infrastructure as Code (IaC)
+- **Automated application generation patterns**
 
 ## 🔧 Prerequisites
 
 - Kubernetes cluster
-- ArgoCD installed
+- ArgoCD installed (with ApplicationSet controller)
 - Sealed Secrets controller installed
 - kubectl configured
 - kubeseal CLI tool
 
 ## 📝 Getting Started
 
-1. Install ArgoCD in your cluster
+1. Install ArgoCD in your cluster (ensure ApplicationSet controller is enabled)
 2. Install Sealed Secrets controller
 3. Create sealed secrets from your TLS certificates
 4. Apply the bootstrap application: `kubectl apply -f ArgoApps/`
-5. Watch ArgoCD sync all applications automatically
+5. Watch ArgoCD ApplicationSet automatically generate and sync canary applications
+6. Monitor both production and canary deployments in ArgoCD UI
 
 ## 🌟 Best Practices Demonstrated
 
@@ -169,8 +178,20 @@ Git Repository → ArgoCD → Kustomize (Overlay) →
 - ✅ Separation of concerns (base vs overlays)
 - ✅ Tag-based versioning (not branch-based)
 - ✅ Progressive delivery with canary deployments
+- ✅ **ApplicationSet for environment automation**
 - ✅ Declarative infrastructure management
+- ✅ **DRY principle with ApplicationSet generators**
+
+## 💡 Why ApplicationSet for Canary?
+
+Using ApplicationSet for canary deployments provides several advantages:
+
+- **Single Source of Truth**: One ApplicationSet manages multiple environments
+- **Automatic Generation**: No need to manually create separate Application manifests
+- **Consistency**: Ensures prod and canary follow the same deployment pattern
+- **Scalability**: Easy to add more environments (staging, dev, etc.)
+- **Reduced Maintenance**: Update deployment logic in one place
 
 ---
 
-**Note**: This project showcases production-ready patterns for deploying and managing applications on Kubernetes using modern DevOps tools and methodologies.
+**Note**: This project showcases production-ready patterns for deploying and managing applications on Kubernetes using modern DevOps tools and methodologies, with a special focus on ArgoCD ApplicationSet for advanced deployment scenarios.
