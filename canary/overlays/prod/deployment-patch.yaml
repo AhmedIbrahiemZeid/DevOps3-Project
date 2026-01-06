@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: prod-caddy   # must match pod labels
+      app: prod-caddy   
   template:
     metadata:
       labels:
